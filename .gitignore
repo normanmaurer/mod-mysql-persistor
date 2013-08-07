@@ -1,12 +1,13 @@
 *.class
 
 # Package Files #
-*.jar
-*.war
-*.ear
-
-.idea
-target
-*.ipl
-*.imr
+.project
+.classpath
+.settings
+*.iml
+*.ipr
 *.iws
+.idea/
+/target
+/reports
+.DS_Store
