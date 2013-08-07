@@ -16,25 +16,22 @@ package me.normanmaurer.vertx.mods
  * under the License.
  *
  */
-import com.github.mauricio.async.db.Connection
+import com.github.mauricio.async.db.Configuration
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import org.vertx.java.busmods.BusModBase
 import org.vertx.java.core.eventbus.Message
 import org.vertx.java.core.Handler
 import org.vertx.java.core.impl.EventLoopContext
 import org.vertx.java.core.json.JsonObject
+import java.nio.charset.Charset
 
 class MysqlPersistor extends BusModBase with Handler[Message[JsonObject]] {
 
-  var connection :MySQLConnection
+  var connection :MySQLConnection = null
 
   override def start() {
     super.start()
-
-
     val address = getOptionalStringConfig("address", "vertx.mysqlpersistor")
-    val configuration = URLParser.parse(createUrl)
-
     // Get access to the underlying EventLoop and pass it to MySQLConnection so no new threads are needed.
     val context = vertx.currentContext().asInstanceOf[EventLoopContext]
     val eventLoop = context.getEventLoop
@@ -42,19 +39,16 @@ class MysqlPersistor extends BusModBase with Handler[Message[JsonObject]] {
     eb.registerHandler(address, this)
   }
 
-  private def createUrl = {
-    val username = getOptionalStringConfig("username", null)
-    val password = getOptionalStringConfig("password", null)
+  private def configuration = {
+    val username = getOptionalStringConfig("username", "root")
+    val password = Option(getOptionalStringConfig("password", null))
     val host = getOptionalStringConfig("host", "localhost")
     val port = getOptionalIntConfig("port", 3306)
-    val dbName = getMandatoryStringConfig("db_name")
+    val dbName = Option(getMandatoryStringConfig("db_name"))
+    val charset = getOptionalStringConfig("charset", Configuration.DefaultCharset.name())
+    val maxMessageSize = getOptionalIntConfig("maxMessageSize", 16 * 1024 * 1024)
 
-    val sb = new StringBuilder
-    sb.append("jdbc:mysql://").append(host).append(':').append(port).append("/").append(dbName)
-    if (username != null && password != null) {
-      sb.append('?').append("username=").append(username).append("&").append("password=").append(password)
-    }
-    sb.toString()
+    Configuration(username = username, host = host, port = port, password = password, database = dbName, charset = Charset.forName(charset), maximumMessageSize =  maxMessageSize)
   }
 
   override def stop() {
@@ -66,3 +60,4 @@ class MysqlPersistor extends BusModBase with Handler[Message[JsonObject]] {
     // TODO: Insert handling code :)
   }
 }
+
