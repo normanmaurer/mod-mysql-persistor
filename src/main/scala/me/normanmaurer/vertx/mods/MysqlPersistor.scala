@@ -53,7 +53,9 @@ class MysqlPersistor extends BusModBase with Handler[Message[JsonObject]] {
 
   override def stop() {
     super.stop()
-    connection.close
+    if (configuration != null) {
+      connection.close
+    }
   }
 
   override def handle(message : Message[JsonObject]) {
