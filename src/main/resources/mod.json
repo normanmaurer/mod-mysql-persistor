@@ -1,0 +1,13 @@
+{
+
+  "main":"me.normanmaurer.vertx.mods.MysqlPersistor",
+
+
+  "description":"Module which allows async mysql access",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Norman Maurer",
+
+  "developers": ["Norman Maurer"],
+  "keywords": ["mysql", "db", "database", "async"],
+  "homepage": "url to your project page"
+}
